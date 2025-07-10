@@ -29,4 +29,4 @@
       "name": "Formatar mensagem",
       "type": "code",
       "language": "javascript",
-      "code": "function escapeMarkdown(text) {\n  return text\n    .replace(/_/g, '\\\\_')\n    .replace(/\\*/g, '\\\\*')\n    .replace(/\\[/g, '\\\\[')\n    .replace(/`/g, '\\\\`');\n}\n\nlet mensagem = \"🎬 *Top 5 lançamentos da semana nos streamings:*\\n\\n\";\n\nfor (const item of items) {\n  const titu]()]()
+      "code": "function escapeMarkdown(text) {\n  return text\n    .replace(/_/g, '\\\\_')\n    .replace(/\\*/g, '\\\\*')\n    .replace(/\\[/g, '\\\\[')\n    .replace(/`/g, '\\\\`');\n}\n\nlet mensagem = \"🎬 *Top 5 filmes da semana:*\\n\\n\";\n\nfor (const item of items) {\n  const titu]()]()
