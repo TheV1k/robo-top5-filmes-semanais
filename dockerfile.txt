@@ -1,0 +1,17 @@
+# Usa a imagem oficial do n8n
+FROM n8nio/n8n:latest
+
+# Copia seu fluxo para o diretório onde o n8n procura por workflows importados
+# Crie uma pasta chamada workflows e dentro coloque seu arquivo fluxo.json
+COPY workflows/ /home/node/.n8n/workflows/
+
+# Define variáveis de ambiente (exemplo, configure conforme suas credenciais e necessidades)
+ENV N8N_BASIC_AUTH_ACTIVE=true
+ENV N8N_BASIC_AUTH_USER=usuario
+ENV N8N_BASIC_AUTH_PASSWORD=senha
+
+# Expõe a porta padrão do n8n
+EXPOSE 5678
+
+# Comando para iniciar o n8n
+CMD ["n8n"]
