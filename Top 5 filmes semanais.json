@@ -1,0 +1,151 @@
+{
+  "name": "Top 5 filmes semanais",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://api.themoviedb.org/3/trending/movie/week?language=pt-BR",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Authorization\": \"Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2OGQ3YmFjM2I5ZDE1YjI5NDUwNWY4MmFkZGI2YTFjNSIsIm5iZiI6MTc1MTYzOTU4Ni43MjMsInN1YiI6IjY4NjdlNjIyNDdlMjdhZWFkNDVlMzdlOCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.RNXVGKObvrFEq1U7dxK4uug0LpY5r2Sf2CGgG_jIj6c\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "dad169c6-ba75-48eb-b434-f4f59e04d08c",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const filmes = items[0].json.results.slice(0, 5);\n\nreturn filmes.map(filme => {\n  return {\n    json: {\n      \n      titulo: filme.title,\n      sinopse: filme.overview,\n      nota: filme.vote_average,\n      data: filme.release_date\n  \n    \n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "cbe8c374-f57c-4c47-a3e7-6d754c105762",
+      "name": "Capturar top 5"
+    },
+    {
+      "parameters": {
+        "jsCode": "function escapeMarkdown(text) {\n  return text\n    .replace(/_/g, '\\\\_')\n    .replace(/\\*/g, '\\\\*')\n    .replace(/\\[/g, '\\\\[')\n    .replace(/`/g, '\\\\`');\n}\n\nlet mensagem = \"🎬 *Top 5 lançamentos da semana nos streamings:*\\n\\n\";\n\nfor (const item of items) {\n  const titulo = escapeMarkdown(item.json.titulo || \"\");\n  const sinopse = escapeMarkdown(item.json.sinopse || \"Sem sinopse.\");\n  const data = item.json.data || \"Data não informada\";\n  const nota = item.json.nota ?? \"s/nota\";\n\n  mensagem += `📌 *${titulo}* (⭐️ ${nota})\\n`;\n  mensagem += `🗓️ Lançamento: ${data}\\n`;\n  mensagem += `📖 ${sinopse}\\n\\n`;\n}\n\nreturn [{\n  json: {\n    texto: mensagem\n  }\n}];\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        0
+      ],
+      "id": "8ff62457-be80-426e-975b-895745393960",
+      "name": "Formatar mensagem"
+    },
+    {
+      "parameters": {
+        "chatId": "918146127",
+        "text": "={{$json[\"texto\"]}}\n",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        920,
+        0
+      ],
+      "id": "0823d832-2247-4ae2-882d-389b23899023",
+      "name": "Send a text message",
+      "webhookId": "1899b1ed-2388-45d8-9d46-c50c65a7cb6e",
+      "credentials": {
+        "telegramApi": {
+          "id": "DhtHD0s2kORh1bcB",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "=0 17 * * MON"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c86e7ffd-6f0c-4ec4-ba1e-acdb422fb41b",
+      "name": "Schedule Trigger",
+      "notesInFlow": false
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Capturar top 5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Capturar top 5": {
+      "main": [
+        [
+          {
+            "node": "Formatar mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatar mensagem": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d896ac8f-3604-4b74-8194-c6d292b76477",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "25089221471a76f861b4f58dcddda6903e6aa4f5efd5d400c0ed763f0ea97f66"
+  },
+  "id": "2BQ7ynZVacN1v99i",
+  "tags": []
+}
